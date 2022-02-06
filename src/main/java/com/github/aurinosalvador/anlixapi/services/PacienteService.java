@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/api/v1/client")
+@RequestMapping("/api/v1/paciente")
 public class PacienteService {
     private static final Logger logger = LoggerFactory.getLogger(PacienteService.class);
 

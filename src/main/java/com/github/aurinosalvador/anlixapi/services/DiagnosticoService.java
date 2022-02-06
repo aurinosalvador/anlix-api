@@ -44,7 +44,7 @@ public class DiagnosticoService {
             String line = br.readLine();
 
 
-            Date date =new SimpleDateFormat("ddMMyyyy").parse(file.getOriginalFilename());
+            Date date = new SimpleDateFormat("ddMMyyyy").parse(file.getOriginalFilename());
             logger.info("data: {}", date);
 
 
@@ -57,7 +57,7 @@ public class DiagnosticoService {
                 Diagnostico diagnostico = new Diagnostico();
                 diagnostico.setData(date);
 
-                if(firstLine){
+                if (firstLine) {
                     type = list[list.length - 1];
                     logger.info("type: {}", list[list.length - 1]);
 
@@ -93,6 +93,15 @@ public class DiagnosticoService {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/paciente/{id}/tipo/{tipo}/last")
+    ResponseEntity<Diagnostico> getByPacienteIdAndType(@PathVariable Long id, @PathVariable String tipo) {
+        List<Diagnostico> diagnosticos = diagnosticoRepository.findByPacienteIdAndTipoOrderByDataDesc(id, tipo);
+
+        return diagnosticos.size() > 0
+                ? ResponseEntity.ok(diagnosticos.get(0))
+                : ResponseEntity.notFound().build();
     }
 
 }

@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> {
+
+    List<Diagnostico> findByPacienteIdAndTipoOrderByDataDesc(Long id, String tipo);
 }
