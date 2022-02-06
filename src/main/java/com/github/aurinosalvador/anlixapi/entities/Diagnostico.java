@@ -1,5 +1,6 @@
 package com.github.aurinosalvador.anlixapi.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ public class Diagnostico {
 
     @ManyToOne
     @JoinColumn(name = "paciente_id")
+    @JsonIgnore
     private Paciente paciente;
 
     private String epoc;

@@ -1,8 +1,8 @@
 package com.github.aurinosalvador.anlixapi.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.aurinosalvador.anlixapi.entities.Paciente;
 import com.github.aurinosalvador.anlixapi.respositories.PacienteRepository;
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -38,12 +37,12 @@ public class PacienteService {
     @PostMapping("/import")
     ResponseEntity<List<Paciente>> importFromFile(@RequestParam("file") MultipartFile file) {
         try {
-            Gson gson = new Gson();
+            ObjectMapper mapper = new ObjectMapper();
 
             File localFile = ResourceUtils.getFile("classpath:targetFile.tmp");
             file.transferTo(localFile);
 
-            Paciente[] arrayJson = gson.fromJson(new FileReader(localFile), Paciente[].class);
+            Paciente[] arrayJson = mapper.readValue(localFile, Paciente[].class);
 
             List<Paciente> pacientes = Arrays.asList(arrayJson);
 

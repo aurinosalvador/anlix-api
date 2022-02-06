@@ -1,6 +1,6 @@
 package com.github.aurinosalvador.anlixapi.entities;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
@@ -19,7 +19,7 @@ public class Paciente {
 
     private String rg;
 
-    @SerializedName("data_nasc")
+    @JsonProperty("data_nasc")
     private String dataNasc;
 
     private String sexo;
@@ -46,7 +46,7 @@ public class Paciente {
 
     private String estado;
 
-    @SerializedName("telefone_fixo")
+    @JsonProperty("telefone_fixo")
     private String telefoneFixo;
 
     private String celular;
@@ -55,7 +55,7 @@ public class Paciente {
 
     private Integer peso;
 
-    @SerializedName("tipo_sanguineo")
+    @JsonProperty("tipo_sanguineo")
     private String tipoSanguineo;
 
     private String cor;
