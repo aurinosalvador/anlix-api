@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,16 +43,22 @@ public class DiagnosticoService {
             BufferedReader br = new BufferedReader(new FileReader(localFile));
             String line = br.readLine();
 
-            Diagnostico diagnostico = new Diagnostico();
-            Date date=new SimpleDateFormat("ddMMyyyy").parse(file.getOriginalFilename());
+
+            Date date =new SimpleDateFormat("ddMMyyyy").parse(file.getOriginalFilename());
             logger.info("data: {}", date);
-            diagnostico.setData(date);
+
+
+            List<Diagnostico> diagnosticos = new ArrayList<>();
+            String type = "";
 
             while (line != null) {
                 String[] list = line.split(" ");
 
+                Diagnostico diagnostico = new Diagnostico();
+                diagnostico.setData(date);
+
                 if(firstLine){
-                    diagnostico.setTipo(list[list.length - 1]);
+                    type = list[list.length - 1];
                     logger.info("type: {}", list[list.length - 1]);
 
                     firstLine = false;
@@ -60,28 +67,32 @@ public class DiagnosticoService {
                 }
 
                 List<Paciente> pacientes = pacienteRepository.findByCpf(list[0]);
-
+                diagnostico.setTipo(type);
                 diagnostico.setPaciente(pacientes.get(0));
-                diagnostico.setEpoc(Long.parseLong(list[1]));
+                diagnostico.setEpoc(list[1]);
                 diagnostico.setValor(Double.parseDouble(list[2]));
 
-//                logger.info("Diagnostico: {} {} - {}: {}",
-//                        diagnostico.getPaciente().getNome(),
-//                        diagnostico.getData(),
-//                        diagnostico.getTipo(),
-//                        diagnostico.getValor()
-//                );
-
+                logger.info("Diagnostico: {} {} - {}: {}",
+                        diagnostico.getPaciente().getNome(),
+                        diagnostico.getData(),
+                        diagnostico.getTipo(),
+                        diagnostico.getValor()
+                );
+                diagnosticos.add(diagnostico);
                 line = br.readLine();
             }
-
-
             br.close();
+
+//            logger.info("Diagnosticos: {}", diagnosticos.size());
+
+            List<Diagnostico> ret = diagnosticoRepository.saveAll(diagnosticos);
+
+            return ResponseEntity.ok(ret);
+
         } catch (IOException | ParseException e) {
             e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
-
-        return ResponseEntity.ok().build();
     }
 
 }

@@ -18,7 +18,7 @@ public class Diagnostico {
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
 
-    private Long epoc;
+    private String epoc;
 
     private String tipo;
 
