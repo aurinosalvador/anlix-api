@@ -1,9 +1,8 @@
 package com.github.aurinosalvador.anlixapi.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.google.gson.annotations.SerializedName;
+
+import javax.persistence.*;
 
 @Entity
 public class Paciente {
@@ -20,6 +19,7 @@ public class Paciente {
 
     private String rg;
 
+    @SerializedName("data_nasc")
     private String dataNasc;
 
     private String sexo;
@@ -46,6 +46,7 @@ public class Paciente {
 
     private String estado;
 
+    @SerializedName("telefone_fixo")
     private String telefoneFixo;
 
     private String celular;
@@ -54,6 +55,7 @@ public class Paciente {
 
     private Integer peso;
 
+    @SerializedName("tipo_sanguineo")
     private String tipoSanguineo;
 
     private String cor;
