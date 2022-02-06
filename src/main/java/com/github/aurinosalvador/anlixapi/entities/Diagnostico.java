@@ -1,6 +1,5 @@
 package com.github.aurinosalvador.anlixapi.entities;
 
-import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +20,9 @@ public class Diagnostico {
 
     private Long epoc;
 
-    private String type;
+    private String tipo;
+
+    private double valor;
 
     private Date data;
 }
