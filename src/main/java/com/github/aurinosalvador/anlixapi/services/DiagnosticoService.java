@@ -106,21 +106,8 @@ public class DiagnosticoService {
 
     @GetMapping("/paciente/{id}")
     ResponseEntity<List<Diagnostico>> getByPacienteId(@PathVariable Long id) {
-        List<Diagnostico> ret = new ArrayList<>();
+        List<Diagnostico> diagnosticos = diagnosticoRepository.findLastByPacienteId(id);
 
-        List<Diagnostico> diagnosticos = diagnosticoRepository.findByPacienteIdAndTipoOrderByDataDesc(id, "ind_pulm");
-
-        if(diagnosticos.size() > 0) {
-            ret.add(diagnosticos.get(0));
-        }
-
-        diagnosticos = diagnosticoRepository.findByPacienteIdAndTipoOrderByDataDesc(id, "ind_card");
-
-        if(diagnosticos.size() > 0) {
-            ret.add(diagnosticos.get(0));
-        }
-
-        return ResponseEntity.ok(ret);
+        return ResponseEntity.ok(diagnosticos);
     }
-
 }
