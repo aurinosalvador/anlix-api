@@ -120,6 +120,27 @@ public class DiagnosticoService {
         return ResponseEntity.ok(diagnosticos);
     }
 
+    @GetMapping("/paciente/{id}/filter/{iniData}/{fimData}")
+    ResponseEntity<List<DiagnosticoDTO>> getByPacienteIdAndDateInterval(@PathVariable Long id, @PathVariable String iniData, @PathVariable String fimData){
+        try {
+            Date initDate = new SimpleDateFormat("dd-MM-yyyy").parse(iniData);
+            Date endDate = new SimpleDateFormat("dd-MM-yyyy").parse(fimData);
+
+            List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findByPacienteIdAndDataBetween(id, initDate, endDate)
+                    .stream()
+                    .map(DiagnosticoDTO::parserDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(diagnosticos);
+
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/paciente/filtro/{data}")
     ResponseEntity<List<Diagnostico>> getByDate(@PathVariable String data){
         List<Diagnostico> diagnosticos = new ArrayList<>();

@@ -18,4 +18,6 @@ public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> 
 
     List<Diagnostico> findByData(Date data);
 
+    List<Diagnostico> findByPacienteIdAndDataBetween(Long id, Date initDate, Date endDate);
+
 }
