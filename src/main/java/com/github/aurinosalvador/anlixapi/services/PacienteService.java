@@ -58,5 +58,15 @@ public class PacienteService {
         return ResponseEntity.internalServerError().build();
     }
 
+    @GetMapping("/filter/{nome}")
+    ResponseEntity<List<Paciente>> getByNameContaining(@PathVariable String nome) {
+
+        List<Paciente> pacientes = pacienteRepository.findByNomeContaining(nome);
+
+        return pacientes.size() > 0
+                ? ResponseEntity.ok(pacientes)
+                : ResponseEntity.notFound().build();
+    }
+
 
 }
