@@ -119,4 +119,25 @@ public class DiagnosticoService {
 
         return ResponseEntity.ok(diagnosticos);
     }
+
+    @GetMapping("/paciente/filtro/{data}")
+    ResponseEntity<List<Diagnostico>> getByDate(@PathVariable String data){
+        List<Diagnostico> diagnosticos = new ArrayList<>();
+        try {
+            Date date = new SimpleDateFormat("dd-MM-yyyy").parse(data);
+
+            diagnosticos = diagnosticoRepository.findByData(date);
+
+            logger.info("Paciente: {}", diagnosticos.get(0).getPaciente());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return diagnosticos.size() > 0
+                ? ResponseEntity.ok(diagnosticos)
+                : ResponseEntity.notFound().build();
+
+    }
 }

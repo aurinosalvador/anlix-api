@@ -4,6 +4,7 @@ import com.github.aurinosalvador.anlixapi.entities.Diagnostico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> {
@@ -14,4 +15,7 @@ public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> 
     List<Diagnostico> findLastByPacienteId(Long id);
 
     List<Diagnostico> findByPacienteIdAndTipoOrderByDataDesc(Long id, String tipo);
+
+    List<Diagnostico> findByData(Date data);
+
 }
