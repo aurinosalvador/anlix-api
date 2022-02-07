@@ -17,7 +17,6 @@ public class Diagnostico {
 
     @ManyToOne
     @JoinColumn(name = "paciente_id")
-    @JsonIgnore
     private Paciente paciente;
 
     private String epoc;

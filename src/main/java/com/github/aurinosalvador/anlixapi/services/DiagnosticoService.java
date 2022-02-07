@@ -1,5 +1,6 @@
 package com.github.aurinosalvador.anlixapi.services;
 
+import com.github.aurinosalvador.anlixapi.DTO.DiagnosticoDTO;
 import com.github.aurinosalvador.anlixapi.entities.Diagnostico;
 import com.github.aurinosalvador.anlixapi.entities.Paciente;
 import com.github.aurinosalvador.anlixapi.respositories.DiagnosticoRepository;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -96,8 +98,11 @@ public class DiagnosticoService {
     }
 
     @GetMapping("/paciente/{id}/tipo/{tipo}/last")
-    ResponseEntity<Diagnostico> getByPacienteIdAndType(@PathVariable Long id, @PathVariable String tipo) {
-        List<Diagnostico> diagnosticos = diagnosticoRepository.findByPacienteIdAndTipoOrderByDataDesc(id, tipo);
+    ResponseEntity<DiagnosticoDTO> getByPacienteIdAndType(@PathVariable Long id, @PathVariable String tipo) {
+        List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findByPacienteIdAndTipoOrderByDataDesc(id, tipo)
+                .stream()
+                .map(DiagnosticoDTO::parserDTO)
+                .collect(Collectors.toList());
 
         return diagnosticos.size() > 0
                 ? ResponseEntity.ok(diagnosticos.get(0))
@@ -105,8 +110,12 @@ public class DiagnosticoService {
     }
 
     @GetMapping("/paciente/{id}")
-    ResponseEntity<List<Diagnostico>> getByPacienteId(@PathVariable Long id) {
-        List<Diagnostico> diagnosticos = diagnosticoRepository.findLastByPacienteId(id);
+    ResponseEntity<List<DiagnosticoDTO>> getByPacienteId(@PathVariable Long id) {
+        List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findLastByPacienteId(id)
+                .stream()
+                .map(DiagnosticoDTO::parserDTO)
+                .collect(Collectors.toList());
+
 
         return ResponseEntity.ok(diagnosticos);
     }
