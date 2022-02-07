@@ -20,4 +20,8 @@ public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> 
 
     List<Diagnostico> findByPacienteIdAndDataBetween(Long id, Date initDate, Date endDate);
 
+    @Query(value = "SELECT * FROM diagnostico d  WHERE paciente_id = ?1 and tipo = ?2 and valor between ?3 and ?4 order by \"data\" desc limit 1", nativeQuery = true)
+    Diagnostico findByPacienteIdAndTipoAndValorBetween(Long id, String tipo, double minValor, double maxValor);
+
+
 }

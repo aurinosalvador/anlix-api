@@ -8,6 +8,7 @@ import com.github.aurinosalvador.anlixapi.respositories.PacienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
@@ -121,7 +122,7 @@ public class DiagnosticoService {
     }
 
     @GetMapping("/paciente/{id}/filter/{iniData}/{fimData}")
-    ResponseEntity<List<DiagnosticoDTO>> getByPacienteIdAndDateInterval(@PathVariable Long id, @PathVariable String iniData, @PathVariable String fimData){
+    ResponseEntity<List<DiagnosticoDTO>> getByPacienteIdAndDateInterval(@PathVariable Long id, @PathVariable String iniData, @PathVariable String fimData) {
         try {
             Date initDate = new SimpleDateFormat("dd-MM-yyyy").parse(iniData);
             Date endDate = new SimpleDateFormat("dd-MM-yyyy").parse(fimData);
@@ -141,8 +142,20 @@ public class DiagnosticoService {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/paciente/{id}/{tipo}/minmax/{minValor}/{maxValor}")
+    ResponseEntity<DiagnosticoDTO> getLastValueBetween(@PathVariable Long id, @PathVariable String tipo, @PathVariable double minValor, @PathVariable double maxValor) {
+
+        Diagnostico diagnostico = diagnosticoRepository.findByPacienteIdAndTipoAndValorBetween(id, tipo, minValor, maxValor);
+
+        if (diagnostico == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(DiagnosticoDTO.parserDTO(diagnostico));
+    }
+
     @GetMapping("/paciente/filtro/{data}")
-    ResponseEntity<List<Diagnostico>> getByDate(@PathVariable String data){
+    ResponseEntity<List<Diagnostico>> getByDate(@PathVariable String data) {
         List<Diagnostico> diagnosticos = new ArrayList<>();
         try {
             Date date = new SimpleDateFormat("dd-MM-yyyy").parse(data);
