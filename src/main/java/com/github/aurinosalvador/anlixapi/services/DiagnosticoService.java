@@ -122,9 +122,20 @@ public class DiagnosticoService {
                 : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/paciente/{id}/last")
+    ResponseEntity<List<DiagnosticoDTO>> getByPacienteIdLast(@PathVariable Long id) {
+        List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findLastByPacienteId(id)
+                .stream()
+                .map(DiagnosticoDTO::parserDTO)
+                .collect(Collectors.toList());
+
+
+        return ResponseEntity.ok(diagnosticos);
+    }
+
     @GetMapping("/paciente/{id}")
     ResponseEntity<List<DiagnosticoDTO>> getByPacienteId(@PathVariable Long id) {
-        List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findLastByPacienteId(id)
+        List<DiagnosticoDTO> diagnosticos = diagnosticoRepository.findByPacienteId(id)
                 .stream()
                 .map(DiagnosticoDTO::parserDTO)
                 .collect(Collectors.toList());

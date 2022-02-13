@@ -1,5 +1,6 @@
 package com.github.aurinosalvador.anlixapi.respositories;
 
+import com.github.aurinosalvador.anlixapi.DTO.DiagnosticoDTO;
 import com.github.aurinosalvador.anlixapi.entities.Diagnostico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +26,5 @@ public interface DiagnosticoRepository extends JpaRepository<Diagnostico, Long> 
             "group by \"data\"  order by \"data\" desc limit 1 )", nativeQuery = true)
     Diagnostico findByPacienteIdAndTipoAndValorBetween(Long id, String tipo, double minValor, double maxValor);
 
-
+    List<Diagnostico> findByPacienteId(Long id);
 }
