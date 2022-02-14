@@ -100,6 +100,7 @@ public class DiagnosticoService {
                     .body("Uploaded the file successfully: " + file.getOriginalFilename());
         } catch (Exception e) {
             logger.error(e.getMessage());
+            storageController.deleteAll();
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body("Could not upload the file: " + file.getOriginalFilename() + "!");

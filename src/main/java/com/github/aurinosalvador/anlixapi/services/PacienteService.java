@@ -62,6 +62,7 @@ public class PacienteService {
 
         } catch (IOException e) {
             logger.error(e.getMessage());
+            storageController.deleteAll();
             return ResponseEntity.internalServerError().build();
         }
     }
