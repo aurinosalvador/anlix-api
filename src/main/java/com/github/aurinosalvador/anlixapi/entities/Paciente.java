@@ -15,6 +15,7 @@ public class Paciente {
 
     private Integer idade;
 
+    @Column(unique = true)
     private String cpf;
 
     private String rg;

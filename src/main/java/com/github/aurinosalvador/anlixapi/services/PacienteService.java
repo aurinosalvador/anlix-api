@@ -1,11 +1,13 @@
 package com.github.aurinosalvador.anlixapi.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.aurinosalvador.anlixapi.controllers.FileStorageController;
 import com.github.aurinosalvador.anlixapi.entities.Paciente;
 import com.github.aurinosalvador.anlixapi.respositories.PacienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
@@ -26,6 +28,9 @@ public class PacienteService {
     @Autowired
     PacienteRepository pacienteRepository;
 
+    @Autowired
+    FileStorageController storageController;
+
     @GetMapping("/")
     ResponseEntity<List<Paciente>> getAll() {
         List<Paciente> pacientes = pacienteRepository
@@ -37,12 +42,13 @@ public class PacienteService {
     @PostMapping("/import")
     ResponseEntity<List<Paciente>> importFromFile(@RequestParam("file") MultipartFile file) {
         try {
+            storageController.init();
+            storageController.save(file);
+            Resource localFile = storageController.load(file.getOriginalFilename());
+
             ObjectMapper mapper = new ObjectMapper();
 
-            File localFile = ResourceUtils.getFile("classpath:targetFile.tmp");
-            file.transferTo(localFile);
-
-            Paciente[] arrayJson = mapper.readValue(localFile, Paciente[].class);
+            Paciente[] arrayJson = mapper.readValue(localFile.getFile(), Paciente[].class);
 
             List<Paciente> pacientes = Arrays.asList(arrayJson);
 
@@ -50,12 +56,14 @@ public class PacienteService {
 
 //            logger.info("Nome: {}", pacientes.get(0).getNome());
 
+            storageController.deleteAll();
+
             return ResponseEntity.ok(ret);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.internalServerError().build();
     }
 
     @GetMapping("/filter/{nome}")
