@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class PacienteService {
     }
 
     @PostMapping("/import")
-    ResponseEntity<List<Paciente>> importFromFile(@RequestParam("file") MultipartFile file) {
+    ResponseEntity<String> importFromFile(@RequestParam("file") MultipartFile file) {
         try {
             storageController.init();
             storageController.save(file);
@@ -52,18 +53,22 @@ public class PacienteService {
 
             List<Paciente> pacientes = Arrays.asList(arrayJson);
 
-            List<Paciente> ret = pacienteRepository.saveAll(pacientes);
+            pacienteRepository.saveAll(pacientes);
 
 //            logger.info("Nome: {}", pacientes.get(0).getNome());
 
             storageController.deleteAll();
 
-            return ResponseEntity.ok(ret);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("Uploaded the file successfully: " + file.getOriginalFilename());
 
         } catch (IOException e) {
             logger.error(e.getMessage());
             storageController.deleteAll();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body("Could not upload the file: " + file.getOriginalFilename() + "!");
         }
     }
 
