@@ -1,6 +1,7 @@
 package com.github.aurinosalvador.anlixapi.services;
 
 import com.github.aurinosalvador.anlixapi.DTO.DiagnosticoDTO;
+import com.github.aurinosalvador.anlixapi.controllers.FileStorageController;
 import com.github.aurinosalvador.anlixapi.entities.Diagnostico;
 import com.github.aurinosalvador.anlixapi.entities.Paciente;
 import com.github.aurinosalvador.anlixapi.respositories.DiagnosticoRepository;
@@ -8,13 +9,14 @@ import com.github.aurinosalvador.anlixapi.respositories.PacienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,20 +37,24 @@ public class DiagnosticoService {
     @Autowired
     PacienteRepository pacienteRepository;
 
+    @Autowired
+    FileStorageController storageController;
+
     @PostMapping("/import")
-    ResponseEntity<List<Diagnostico>> importFromFile(@RequestParam("file") MultipartFile file) {
-
+    ResponseEntity<String> importFromFile(@RequestParam("file") MultipartFile file) {
         try {
-            boolean firstLine = true;
-            File localFile = ResourceUtils.getFile("classpath:targetFile.tmp");
-            file.transferTo(localFile);
+            storageController.init();
 
-            BufferedReader br = new BufferedReader(new FileReader(localFile));
+            String filename = storageController.save(file);
+
+            Resource localFile = storageController.load(filename);
+
+            boolean firstLine = true;
+            BufferedReader br = new BufferedReader(new FileReader(localFile.getFile()));
             String line = br.readLine();
 
-
             Date date = new SimpleDateFormat("ddMMyyyy").parse(file.getOriginalFilename());
-            logger.info("data: {}", date);
+//            logger.info("data: {}", date);
 
 
             List<Diagnostico> diagnosticos = new ArrayList<>();
@@ -62,7 +68,7 @@ public class DiagnosticoService {
 
                 if (firstLine) {
                     type = list[list.length - 1];
-                    logger.info("type: {}", list[list.length - 1]);
+//                    logger.info("type: {}", list[list.length - 1]);
 
                     firstLine = false;
                     line = br.readLine();
@@ -75,26 +81,28 @@ public class DiagnosticoService {
                 diagnostico.setEpoc(list[1]);
                 diagnostico.setValor(Double.parseDouble(list[2]));
 
-                logger.info("Diagnostico: {} {} - {}: {}",
-                        diagnostico.getPaciente().getNome(),
-                        diagnostico.getData(),
-                        diagnostico.getTipo(),
-                        diagnostico.getValor()
-                );
+//                logger.info("Diagnostico: {} {} - {}: {}",
+//                        diagnostico.getPaciente().getNome(),
+//                        diagnostico.getData(),
+//                        diagnostico.getTipo(),
+//                        diagnostico.getValor()
+//                );
                 diagnosticos.add(diagnostico);
                 line = br.readLine();
             }
             br.close();
 
-//            logger.info("Diagnosticos: {}", diagnosticos.size());
+            diagnosticoRepository.saveAll(diagnosticos);
 
-            List<Diagnostico> ret = diagnosticoRepository.saveAll(diagnosticos);
-
-            return ResponseEntity.ok(ret);
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            storageController.deleteAll();
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("Uploaded the file successfully: " + file.getOriginalFilename());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.EXPECTATION_FAILED)
+                    .body("Could not upload the file: " + file.getOriginalFilename() + "!");
         }
     }
 
